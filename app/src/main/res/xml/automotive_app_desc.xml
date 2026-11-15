@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Declares this as an AAOS media app so the car launcher and media center surface it. -->
+<automotiveApp xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses name="media" />
+</automotiveApp>
