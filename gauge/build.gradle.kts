@@ -52,22 +52,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
 }
 
-/**
- * JVM micro-benchmark for GaugeGeometry tessellation. Hands-rolled: warmup rounds plus
- * timed rounds, no benchmarking framework. Run with:
- *   ./gradlew :gauge:geometryBenchmark -PoutDir=results
- */
-tasks.register<JavaExec>("geometryBenchmark") {
-    group = "verification"
-    description = "Runs GaugeGeometryBenchmark on the JVM and writes geometry_benchmark.json"
-    dependsOn("testClasses")
-    mainClass.set("com.autocockpit.gauge.bench.GaugeGeometryBenchmarkKt")
-    classpath = files(
-        layout.buildDirectory.dir("tmp/kotlin-classes/test"),
-        layout.buildDirectory.dir("intermediates/javac/debugUnitTest/classes"),
-        configurations.named("testRuntimeClasspath"),
-    )
-    args = listOf(rootProject.file("results").absolutePath)
-    systemProperty("java.awt.headless", "true")
-    outputs.upToDateWhen { false }
+tasks.withType<Test>().configureEach {
+    // The geometry micro-benchmark writes its measured JSON into the repository results dir.
+    systemProperty("autocockpit.resultsDir", rootProject.file("results").absolutePath)
+    maxHeapSize = "1g"
 }

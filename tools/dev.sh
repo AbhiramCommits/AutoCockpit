@@ -41,7 +41,7 @@ run_sim() {
 
 run_geometry_benchmark() {
   echo "== geometry benchmark =="
-  "$GRADLE" --console=plain :gauge:geometryBenchmark
+  "$GRADLE" --console=plain :gauge:test --tests "*GaugeGeometryBenchmarkTest*"
 }
 
 run_emulator() {
