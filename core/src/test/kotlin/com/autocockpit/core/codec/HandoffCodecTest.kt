@@ -6,11 +6,11 @@ import com.autocockpit.core.domain.MediaQueue
 import com.autocockpit.core.domain.SampleStatus
 import com.autocockpit.core.domain.SignalSample
 import com.autocockpit.core.domain.VehicleSignal
-import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class HandoffCodecTest {
 

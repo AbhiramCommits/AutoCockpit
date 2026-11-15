@@ -38,7 +38,13 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(com.autocockpit.app.AppGraph.get(androidx.compose.ui.platform.LocalContext.current.applicationContext))),
+    viewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModel.factory(
+            com.autocockpit.app.AppGraph.get(
+                androidx.compose.ui.platform.LocalContext.current.applicationContext,
+            ),
+        ),
+    ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Column(

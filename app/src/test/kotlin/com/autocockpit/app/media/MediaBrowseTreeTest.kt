@@ -1,6 +1,5 @@
 package com.autocockpit.app.media
 
-import android.support.v4.media.MediaBrowserCompat
 import com.autocockpit.app.media.MediaBrowseTree.Companion.HANDOFF_NODE
 import com.autocockpit.app.media.MediaBrowseTree.Companion.HANDOFF_QUEUE_NODE
 import com.autocockpit.app.media.MediaBrowseTree.Companion.PLAYLISTS_NODE

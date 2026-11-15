@@ -5,10 +5,10 @@ import com.autocockpit.core.handoff.HandoffProtocol
 import com.autocockpit.core.simulation.SimulationConfig
 import com.autocockpit.core.simulation.SimulationHarness
 import com.autocockpit.core.simulation.SimulationReport
-import java.io.File
-import kotlin.system.exitProcess
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
+import kotlin.system.exitProcess
 
 /**
  * Entry point for the headless AutoCockpit tooling.
@@ -98,7 +98,10 @@ private fun runSimulate(args: List<String>) {
 
     val file = File(out)
     file.parentFile?.mkdirs()
-    val json = Json { prettyPrint = true; encodeDefaults = true }
+    val json = Json {
+        prettyPrint = true
+        encodeDefaults = true
+    }
     file.writeText(json.encodeToString(report))
 
     printSummary(report, elapsedMs, file.path)
@@ -115,18 +118,47 @@ private fun List<String>.requireValue(index: Int, flag: String): String {
 private fun printSummary(report: SimulationReport, elapsedMs: Double, path: String) {
     val handoff = report.handoff
     println("AutoCockpit simulation ${report.build.version} (schema ${report.build.schemaVersion})")
-    println("  seed ${report.config.seed}, ${report.config.sessionsPerLossRate} sessions x ${report.config.lossRates.size} loss rates = ${report.config.totalSessions} sessions")
-    println("  wall time %.2f ms (%.2f us/session)".format(elapsedMs, elapsedMs * 1000.0 / report.config.totalSessions))
-    println("  handoff success ${handoff.successRate}% (${handoff.succeeded}/${handoff.sessions}), retransmits mean ${handoff.chunkRetransmits.mean} p95 ${handoff.chunkRetransmits.p95}")
-    println("  reconnect attempts mean ${handoff.meanReconnectAttempts.mean} p95 ${handoff.meanReconnectAttempts.p95}; recovery mean ${handoff.meanRecoveryLatencyMs.mean}ms p95 ${handoff.meanRecoveryLatencyMs.p95}ms")
+    println(
+        "  seed ${report.config.seed}, ${report.config.sessionsPerLossRate} sessions x " +
+            "${report.config.lossRates.size} loss rates = ${report.config.totalSessions} sessions",
+    )
+    println(
+        "  wall time %.2f ms (%.2f us/session)".format(
+            elapsedMs,
+            elapsedMs * 1000.0 / report.config.totalSessions,
+        ),
+    )
+    println(
+        "  handoff success ${handoff.successRate}% (${handoff.succeeded}/${handoff.sessions}), " +
+            "retransmits mean ${handoff.chunkRetransmits.mean} p95 ${handoff.chunkRetransmits.p95}",
+    )
+    println(
+        "  reconnect attempts mean ${handoff.meanReconnectAttempts.mean} " +
+            "p95 ${handoff.meanReconnectAttempts.p95}; recovery mean " +
+            "${handoff.meanRecoveryLatencyMs.mean}ms p95 ${handoff.meanRecoveryLatencyMs.p95}ms",
+    )
     for (rate in handoff.byLossRate) {
-        println("    loss %.0f%%: success %.2f%%, retransmits mean %.2f p95 %.0f, recovery mean %.2fms p95 %.0fms".format(
-            rate.lossRate * 100, rate.successRate, rate.retransmits.mean, rate.retransmits.p95,
-            rate.recoveryLatencyMs.mean, rate.recoveryLatencyMs.p95,
-        ))
+        val line = "    loss %.0f%%: success %.2f%%, retransmits mean %.2f p95 %.0f, " +
+            "recovery mean %.2fms p95 %.0fms"
+        println(
+            line.format(
+                rate.lossRate * 100,
+                rate.successRate,
+                rate.retransmits.mean,
+                rate.retransmits.p95,
+                rate.recoveryLatencyMs.mean,
+                rate.recoveryLatencyMs.p95,
+            ),
+        )
     }
     val degradation = report.degradation
-    println("  degradation frames ${degradation.framesObserved}: LIVE ${degradation.livePct}% LAST_KNOWN ${degradation.lastKnownPct}% UNAVAILABLE ${degradation.unavailablePct}%")
-    println("  payload 500 tracks: ${report.payload.fiveHundredTrackBytes} bytes, ${report.payload.fiveHundredTrackChunksAt20} chunks at the 20-byte ATT payload")
+    println(
+        "  degradation frames ${degradation.framesObserved}: LIVE ${degradation.livePct}% " +
+            "LAST_KNOWN ${degradation.lastKnownPct}% UNAVAILABLE ${degradation.unavailablePct}%",
+    )
+    println(
+        "  payload 500 tracks: ${report.payload.fiveHundredTrackBytes} bytes, " +
+            "${report.payload.fiveHundredTrackChunksAt20} chunks at the 20-byte ATT payload",
+    )
     println("  wrote $path")
 }

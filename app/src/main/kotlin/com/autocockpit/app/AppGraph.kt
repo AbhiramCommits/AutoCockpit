@@ -54,7 +54,7 @@ class AppGraph private constructor(context: Context) {
         return server.start()
     }
 
-    fun companionLinkStatus(): String = gattServer?.status ?: "stopped" 
+    fun companionLinkStatus(): String = gattServer?.status ?: "stopped"
 
     companion object {
         @Volatile

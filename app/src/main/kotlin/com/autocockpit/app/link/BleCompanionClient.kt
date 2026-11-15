@@ -46,6 +46,7 @@ class BleCompanionClient(
     private var statusCharacteristic: BluetoothGattCharacteristic? = null
     private var readyLatch: CountDownLatch? = null
     private var mtuLatch: CountDownLatch? = null
+
     @Volatile private var negotiatedMtu: Int = 0
 
     override fun connect(): Boolean {

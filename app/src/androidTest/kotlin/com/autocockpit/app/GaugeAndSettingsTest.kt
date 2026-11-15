@@ -54,6 +54,11 @@ class GaugeAndSettingsTest {
         awaitCondition(10_000, "gauge GL surface") { GaugeView.latest() != null }
         val view = GaugeView.latest()
         assertNotNull(view)
+        // GL surface creation is asynchronous: wait for the program or a shader error.
+        awaitCondition(15_000, "GL program") {
+            val renderer = view!!.rendererForTest
+            renderer.programHandle != 0 || renderer.lastError != null
+        }
         assertTrue(view!!.rendererForTest.programHandle != 0 || view.rendererForTest.lastError != null)
 
         awaitCondition(15_000, "rendered frames") { view.frameStats().count > 0 }

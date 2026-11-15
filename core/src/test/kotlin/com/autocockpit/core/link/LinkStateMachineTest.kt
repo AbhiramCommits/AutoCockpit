@@ -159,8 +159,15 @@ class LinkStateMachineTest {
     fun resetFromAnyStateReturnsToDisconnected() {
         for (builder in listOf<(LinkStateMachine) -> Unit>(
             { it.on(LinkEvent.StartRequested) },
-            { m -> m.on(LinkEvent.StartRequested); m.on(LinkEvent.PeerDiscovered) },
-            { m -> m.on(LinkEvent.StartRequested); m.on(LinkEvent.PeerDiscovered); m.on(LinkEvent.Connected) },
+            { m ->
+                m.on(LinkEvent.StartRequested)
+                m.on(LinkEvent.PeerDiscovered)
+            },
+            { m ->
+                m.on(LinkEvent.StartRequested)
+                m.on(LinkEvent.PeerDiscovered)
+                m.on(LinkEvent.Connected)
+            },
         )) {
             val machine = LinkStateMachine(policy, Random(12))
             builder(machine)
@@ -212,10 +219,19 @@ class LinkStateMachineTest {
             Case({}, LinkState.DISCONNECTED, LinkEvent.ScanTimedOut),
             Case({ it.on(LinkEvent.StartRequested) }, LinkState.SCANNING, LinkEvent.SyncCompleted),
             Case({ it.on(LinkEvent.StartRequested) }, LinkState.SCANNING, LinkEvent.MtuNegotiated(64)),
-            Case({ m -> m.on(LinkEvent.StartRequested); m.on(LinkEvent.PeerDiscovered) }, LinkState.CONNECTING, LinkEvent.SyncCompleted),
-            Case({ m -> m.on(LinkEvent.StartRequested); m.on(LinkEvent.PeerDiscovered) }, LinkState.CONNECTING, LinkEvent.MtuNegotiated(64)),
+            Case({ m ->
+                m.on(LinkEvent.StartRequested)
+                m.on(LinkEvent.PeerDiscovered)
+            }, LinkState.CONNECTING, LinkEvent.SyncCompleted),
+            Case({ m ->
+                m.on(LinkEvent.StartRequested)
+                m.on(LinkEvent.PeerDiscovered)
+            }, LinkState.CONNECTING, LinkEvent.MtuNegotiated(64)),
             Case({
-                m -> m.on(LinkEvent.StartRequested); m.on(LinkEvent.PeerDiscovered); m.on(LinkEvent.Connected)
+                    m ->
+                m.on(LinkEvent.StartRequested)
+                m.on(LinkEvent.PeerDiscovered)
+                m.on(LinkEvent.Connected)
             }, LinkState.NEGOTIATING_MTU, LinkEvent.Connected),
             Case(::seedSynced, LinkState.SYNCED, LinkEvent.SyncCompleted),
             Case(::seedSynced, LinkState.SYNCED, LinkEvent.ReconnectTick),

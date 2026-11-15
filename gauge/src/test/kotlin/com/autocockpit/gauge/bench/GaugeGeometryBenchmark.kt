@@ -91,7 +91,11 @@ object GaugeGeometryBenchmark {
         results.forEach { r ->
             appendLine(
                 "  %8d  %8d  %9.1f  %11.1f  %11d".format(
-                    r.segments, r.verticesPerUpdate, r.nanosPerUpdate, r.verticesPerMs, r.allocationCount,
+                    r.segments,
+                    r.verticesPerUpdate,
+                    r.nanosPerUpdate,
+                    r.verticesPerMs,
+                    r.allocationCount,
                 ),
             )
         }

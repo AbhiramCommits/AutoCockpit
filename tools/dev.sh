@@ -28,8 +28,8 @@ run_unit() {
 }
 
 run_lint() {
-  echo "== lint =="
-  "$GRADLE" --console=plain lint
+  echo "== lint + formatting =="
+  "$GRADLE" --console=plain lint spotlessCheck
 }
 
 run_sim() {
@@ -40,8 +40,10 @@ run_sim() {
 }
 
 run_geometry_benchmark() {
-  echo "== geometry benchmark =="
-  "$GRADLE" --console=plain :gauge:testDebugUnitTest --tests "*GaugeGeometryBenchmarkTest*"
+  # The benchmark is a normal JUnit test, so run the full gauge suite: filtering with --tests
+  # would replace the gauge test-results directory and skew the unit-test aggregation.
+  echo "== gauge tests + geometry benchmark =="
+  "$GRADLE" --console=plain :gauge:testDebugUnitTest
 }
 
 run_emulator() {

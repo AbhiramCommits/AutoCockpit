@@ -1,9 +1,9 @@
 package com.autocockpit.gauge.bench
 
-import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 /**
  * Runs the micro-benchmark inside the normal unit-test task so every `:gauge:test` produces a

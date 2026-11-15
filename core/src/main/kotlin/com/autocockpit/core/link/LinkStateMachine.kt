@@ -205,7 +205,9 @@ object LinkReducer {
             LinkState.DISCONNECTED -> illegal(current, event)
             LinkState.SCANNING -> when (event) {
                 is LinkEvent.PeerDiscovered -> forward(
-                    current, LinkState.CONNECTING, event,
+                    current,
+                    LinkState.CONNECTING,
+                    event,
                     listOf(LinkEffect.StopScan, LinkEffect.Connect),
                 )
                 is LinkEvent.ScanTimedOut -> backoff(current, policy, jitterUnit, event, "scan timed out")
@@ -234,7 +236,10 @@ object LinkReducer {
                     )
                 } else {
                     backoff(
-                        current, policy, jitterUnit, event,
+                        current,
+                        policy,
+                        jitterUnit,
+                        event,
                         "negotiated mtu ${event.mtu} below the BLE minimum 23",
                     )
                 }
@@ -287,8 +292,12 @@ object LinkReducer {
                     } else {
                         val next = current.copy(state = LinkState.SCANNING, lastError = current.lastError)
                         Transition(
-                            state, LinkState.SCANNING, TransitionKind.RECOVERY, next,
-                            listOf(LinkEffect.BeginScan), event,
+                            state,
+                            LinkState.SCANNING,
+                            TransitionKind.RECOVERY,
+                            next,
+                            listOf(LinkEffect.BeginScan),
+                            event,
                         )
                     }
                 }

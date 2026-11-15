@@ -27,35 +27,35 @@ class MediaBrowseTree(private val catalog: Catalog) {
         recent: List<MediaTrack>,
     ): List<MediaBrowserCompat.MediaItem> {
         return when {
-        parentId == ROOT_ID -> rootItems()
-        parentId == PLAYLISTS_NODE -> catalog.playlists.map { playlist ->
-            browsable(
-                id = playlistId(playlist.id),
-                title = playlist.name,
-                subtitle = "${playlist.trackIds.size} tracks",
+            parentId == ROOT_ID -> rootItems()
+            parentId == PLAYLISTS_NODE -> catalog.playlists.map { playlist ->
+                browsable(
+                    id = playlistId(playlist.id),
+                    title = playlist.name,
+                    subtitle = "${playlist.trackIds.size} tracks",
+                )
+            }
+            parentId == RECENT_NODE -> listOf(
+                browsable(
+                    id = RECENT_LIST_NODE,
+                    title = "Recently Played",
+                    subtitle = if (recent.isEmpty()) "Nothing played yet" else "${recent.size} tracks",
+                ),
             )
-        }
-        parentId == RECENT_NODE -> listOf(
-            browsable(
-                id = RECENT_LIST_NODE,
-                title = "Recently Played",
-                subtitle = if (recent.isEmpty()) "Nothing played yet" else "${recent.size} tracks",
-            ),
-        )
-        parentId == HANDOFF_NODE -> listOf(
-            browsable(
-                id = HANDOFF_QUEUE_NODE,
-                title = "Phone Queue",
-                subtitle = handoff?.let { "${it.queue.tracks.size} tracks from ${it.profile.displayName}" }
-                    ?: "Waiting for companion handoff",
-            ),
-        )
-        parentId.startsWith(PLAYLIST_PREFIX) -> {
-            val playlist = catalog.playlist(parentId.removePrefix(PLAYLIST_PREFIX))
-                ?: return emptyList()
-            catalog.tracks(playlist.trackIds).map { playable(it.toMediaTrack()) }
-        }
-        parentId == RECENT_LIST_NODE -> recent.map(::playable)
+            parentId == HANDOFF_NODE -> listOf(
+                browsable(
+                    id = HANDOFF_QUEUE_NODE,
+                    title = "Phone Queue",
+                    subtitle = handoff?.let { "${it.queue.tracks.size} tracks from ${it.profile.displayName}" }
+                        ?: "Waiting for companion handoff",
+                ),
+            )
+            parentId.startsWith(PLAYLIST_PREFIX) -> {
+                val playlist = catalog.playlist(parentId.removePrefix(PLAYLIST_PREFIX))
+                    ?: return emptyList()
+                catalog.tracks(playlist.trackIds).map { playable(it.toMediaTrack()) }
+            }
+            parentId == RECENT_LIST_NODE -> recent.map(::playable)
             parentId == HANDOFF_QUEUE_NODE -> handoff?.queue?.tracks.orEmpty().map(::playable)
             else -> emptyList()
         }

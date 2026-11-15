@@ -1,13 +1,19 @@
 > Task :core:checkKotlinGradlePluginConfigurationErrors
-> Task :core:compileKotlin UP-TO-DATE
-> Task :core:compileJava NO-SOURCE
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
 > Task :core:processResources NO-SOURCE
+> Task :spotlessKotlin
+> Task :spotlessKotlinApply
+> Task :spotlessKotlinGradle UP-TO-DATE
+> Task :spotlessKotlinGradleApply UP-TO-DATE
+> Task :spotlessApply
+> Task :core:compileKotlin
+> Task :core:compileJava NO-SOURCE
 > Task :core:classes UP-TO-DATE
 
 > Task :core:run
 AutoCockpit simulation 0.7.0 (schema 1)
   seed 42, 500 sessions x 4 loss rates = 2000 sessions
-  wall time 5804.27 ms (2902.13 us/session)
+  wall time 5847.63 ms (2923.81 us/session)
   handoff success 100.0% (2000/2000), retransmits mean 7.62 p95 29.0
   reconnect attempts mean 1.0 p95 1.0; recovery mean 498.25ms p95 717.0ms
     loss 0%: success 100.00%, retransmits mean 1.36 p95 4, recovery mean 501.63ms p95 711ms
@@ -18,5 +24,5 @@ AutoCockpit simulation 0.7.0 (schema 1)
   payload 500 tracks: 48002 bytes, 3001 chunks at the 20-byte ATT payload
   wrote results/simulation.json
 
-BUILD SUCCESSFUL in 6s
-3 actionable tasks: 2 executed, 1 up-to-date
+BUILD SUCCESSFUL in 7s
+8 actionable tasks: 5 executed, 3 up-to-date

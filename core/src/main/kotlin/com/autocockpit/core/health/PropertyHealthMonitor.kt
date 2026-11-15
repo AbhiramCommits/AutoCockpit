@@ -139,7 +139,11 @@ class PropertyHealthMonitor(
 
             burst ->
                 SignalView(
-                    signal, UiTier.UNAVAILABLE, goodValue, goodAge, last.status,
+                    signal,
+                    UiTier.UNAVAILABLE,
+                    goodValue,
+                    goodAge,
+                    last.status,
                     "error burst (${policy.errorBurstThreshold} within ${policy.errorBurstWindowMillis}ms)",
                 )
 

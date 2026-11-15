@@ -30,7 +30,7 @@ jobs:
           cache-read-only: false
 
       - name: Unit tests, lint and debug APK
-        run: ./gradlew --no-daemon --console=plain :core:test :gauge:test :app:testDebugUnitTest lint assembleDebug
+        run: ./gradlew --no-daemon --console=plain :core:test :gauge:test :app:testDebugUnitTest lint spotlessCheck assembleDebug
 
       - name: Aggregate measured results
         if: always()

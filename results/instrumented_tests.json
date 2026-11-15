@@ -3,7 +3,7 @@
   "tests": 7,
   "failures": 0,
   "passRate": 100.0,
-  "wallTimeSeconds": 35.28,
+  "wallTimeSeconds": 34.41,
   "suites": [
     {
       "module": "app",
@@ -11,7 +11,7 @@
       "tests": 6,
       "failures": 0,
       "errors": 0,
-      "timeSeconds": 32.18
+      "timeSeconds": 27.41
     },
     {
       "module": "gauge",
@@ -19,7 +19,7 @@
       "tests": 1,
       "failures": 0,
       "errors": 0,
-      "timeSeconds": 3.1
+      "timeSeconds": 7.0
     }
   ],
   "note": null

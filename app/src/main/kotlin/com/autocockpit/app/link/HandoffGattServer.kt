@@ -15,7 +15,6 @@ import android.bluetooth.le.AdvertiseSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import com.autocockpit.core.handoff.HandoffCharacteristic
 import com.autocockpit.core.handoff.HandoffProtocol
 import com.autocockpit.core.handoff.HandoffRepository
 import com.autocockpit.core.handoff.HandoffServerCore

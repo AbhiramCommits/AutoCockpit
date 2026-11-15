@@ -20,6 +20,7 @@ class GaugeView @JvmOverloads constructor(
 ) : GLSurfaceView(context, attrs) {
 
     private val gaugeRenderer = GaugeRenderer()
+
     // 2048 samples keeps the whole 1800-frame benchmark in the window.
     private val tracker = FrameTimeTracker(windowCapacity = 2048)
 

@@ -85,7 +85,9 @@ fun GaugeScreen(viewModel: GaugeViewModel) {
                 modifier = Modifier.padding(top = 8.dp).testTag(UiTags.GAUGE_TIER_LABEL),
             )
             Text(
-                text = "battery ${state.batteryPct.roundToInt()}%  ·  range ${state.rangeKm.roundToInt()} km  ·  cabin ${"%.1f".format(state.hvacC)} °C",
+                text = "battery ${state.batteryPct.roundToInt()}%  ·  " +
+                    "range ${state.rangeKm.roundToInt()} km  ·  " +
+                    "cabin ${"%.1f".format(state.hvacC)} °C",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 6.dp),

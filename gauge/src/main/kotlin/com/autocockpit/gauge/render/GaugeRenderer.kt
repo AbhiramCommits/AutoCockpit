@@ -220,7 +220,8 @@ class GaugeRenderer(
         private const val TAG = "GaugeRenderer"
         private const val STRIDE_BYTES = 7 * 4
 
-        internal fun vertexSource(es3: Boolean): String = if (es3) """
+        internal fun vertexSource(es3: Boolean): String = if (es3) {
+            """
             #version 300 es
             uniform float uAspect;
             uniform float uScale;
@@ -236,7 +237,9 @@ class GaugeRenderer(
                 vValue = aValue;
                 gl_Position = vec4(aPosition.x / uAspect * uScale, aPosition.y * uScale, 0.0, 1.0);
             }
-        """.trimIndent() else """
+            """.trimIndent()
+        } else {
+            """
             uniform float uAspect;
             uniform float uScale;
             attribute vec2 aPosition;
@@ -251,7 +254,8 @@ class GaugeRenderer(
                 vValue = aValue;
                 gl_Position = vec4(aPosition.x / uAspect * uScale, aPosition.y * uScale, 0.0, 1.0);
             }
-        """.trimIndent()
+            """.trimIndent()
+        }
 
         internal fun fragmentSource(es3: Boolean): String {
             val header = if (es3) "#version 300 es\nprecision mediump float;\nout vec4 fragColor;\n" else "precision mediump float;\n"

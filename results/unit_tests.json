@@ -2,14 +2,14 @@
   "tests": 234,
   "failures": 0,
   "passRate": 100.0,
-  "wallTimeSeconds": 6.86,
+  "wallTimeSeconds": 9.99,
   "modules": {
     "core": {
       "tests": 160,
       "failures": 0,
       "errors": 0,
       "passRate": 100.0,
-      "wallTimeSeconds": 1.68,
+      "wallTimeSeconds": 1.72,
       "suites": [
         {
           "suite": "com.autocockpit.core.BuildInfoTest",
@@ -23,42 +23,42 @@
           "tests": 24,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.1
+          "timeSeconds": 0.09
         },
         {
           "suite": "com.autocockpit.core.codec.HandoffCodecTest",
           "tests": 22,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.4
+          "timeSeconds": 0.59
         },
         {
           "suite": "com.autocockpit.core.handoff.CompanionClientTest",
           "tests": 15,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.4
+          "timeSeconds": 0.14
         },
         {
           "suite": "com.autocockpit.core.handoff.HandoffProtocolTest",
           "tests": 11,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.0
+          "timeSeconds": 0.01
         },
         {
           "suite": "com.autocockpit.core.handoff.HandoffServerCoreTest",
           "tests": 16,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.02
+          "timeSeconds": 0.01
         },
         {
           "suite": "com.autocockpit.core.health.PropertyHealthMonitorTest",
           "tests": 17,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.03
+          "timeSeconds": 0.01
         },
         {
           "suite": "com.autocockpit.core.link.LinkStateMachineTest",
@@ -79,14 +79,14 @@
           "tests": 12,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.71
+          "timeSeconds": 0.83
         },
         {
           "suite": "com.autocockpit.core.simulation.StatsTest",
           "tests": 4,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.0
+          "timeSeconds": 0.01
         }
       ]
     },
@@ -95,14 +95,14 @@
       "failures": 0,
       "errors": 0,
       "passRate": 100.0,
-      "wallTimeSeconds": 2.17,
+      "wallTimeSeconds": 3.51,
       "suites": [
         {
           "suite": "com.autocockpit.gauge.bench.GaugeGeometryBenchmarkTest",
           "tests": 1,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 2.08
+          "timeSeconds": 3.44
         },
         {
           "suite": "com.autocockpit.gauge.math.GaugeGeometryTest",
@@ -125,49 +125,49 @@
       "failures": 0,
       "errors": 0,
       "passRate": 100.0,
-      "wallTimeSeconds": 3.01,
+      "wallTimeSeconds": 4.76,
       "suites": [
         {
           "suite": "com.autocockpit.app.car.CarPropertyGatewayFactoryTest",
           "tests": 3,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 2.34
+          "timeSeconds": 3.65
         },
         {
           "suite": "com.autocockpit.app.link.CompanionLinkControllerTest",
           "tests": 5,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.01
+          "timeSeconds": 0.02
         },
         {
           "suite": "com.autocockpit.app.media.MediaBrowseTreeTest",
           "tests": 11,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.17
+          "timeSeconds": 0.31
         },
         {
           "suite": "com.autocockpit.app.media.MediaBrowserServiceTest",
           "tests": 10,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.42
+          "timeSeconds": 0.64
         },
         {
           "suite": "com.autocockpit.app.ui.GaugeViewModelTest",
           "tests": 5,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.06
+          "timeSeconds": 0.11
         },
         {
           "suite": "com.autocockpit.app.ui.SettingsViewModelTest",
           "tests": 12,
           "failures": 0,
           "errors": 0,
-          "timeSeconds": 0.02
+          "timeSeconds": 0.04
         }
       ]
     }

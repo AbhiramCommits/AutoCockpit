@@ -2,7 +2,6 @@ package com.autocockpit.app.media
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
-import android.media.AudioManager
 import android.media.AudioTrack
 import android.util.Log
 import kotlin.math.PI

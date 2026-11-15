@@ -9,10 +9,10 @@ import android.opengl.GLES20
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.autocockpit.gauge.render.GaugeRenderer
-import java.io.File
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 /**
  * Offscreen-EGL benchmark: creates a pbuffer context, renders 1000 gauge frames (after 100 warmup
@@ -118,8 +118,10 @@ class OffscreenGaugeBenchmark {
             check(context != EGL14.EGL_NO_CONTEXT) { "no EGL context" }
 
             val surfaceAttribs = intArrayOf(
-                EGL14.EGL_WIDTH, size,
-                EGL14.EGL_HEIGHT, size,
+                EGL14.EGL_WIDTH,
+                size,
+                EGL14.EGL_HEIGHT,
+                size,
                 EGL14.EGL_NONE,
             )
             surface = EGL14.eglCreatePbufferSurface(display, config, surfaceAttribs, 0)

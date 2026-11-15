@@ -62,9 +62,6 @@ internal class ByteWriter(initialCapacity: Int = 256) {
     }
 
     fun toByteArray(): ByteArray = buffer.copyOf(size)
-
-    /** Direct access for writing a pre-sized body in place (used for the header). */
-    fun raw(): ByteArray = buffer
 }
 
 /** Big-endian reader with bounds-checked accessors. */
@@ -166,7 +163,4 @@ object Crc16 {
         }
         return crc and 0xFFFF
     }
-
-    /** Residual check used by decoders: CRC over data + appended CRC equals 0xF0B8. */
-    fun residual(data: ByteArray): Int = of(data)
 }

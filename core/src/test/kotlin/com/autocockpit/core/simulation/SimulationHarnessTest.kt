@@ -17,7 +17,10 @@ class SimulationHarnessTest {
         simulatedFramesPerSession = 30,
     )
 
-    private val json = Json { prettyPrint = true; encodeDefaults = true }
+    private val json = Json {
+        prettyPrint = true
+        encodeDefaults = true
+    }
 
     @Test
     fun sameSeedProducesIdenticalReports() {

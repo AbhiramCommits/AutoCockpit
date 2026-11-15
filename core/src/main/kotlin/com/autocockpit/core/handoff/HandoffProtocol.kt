@@ -174,7 +174,8 @@ enum class AbortReason(val code: Int) {
     PROTOCOL_ERROR(4),
     NO_TRANSFER(5),
     INCOMPLETE(6),
-    TIMEOUT(7);
+    TIMEOUT(7),
+    ;
 
     companion object {
         fun fromCode(code: Int): AbortReason = entries.firstOrNull { it.code == code } ?: PROTOCOL_ERROR
