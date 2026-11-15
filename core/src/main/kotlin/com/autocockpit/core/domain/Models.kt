@@ -98,7 +98,14 @@ sealed class VehicleSignal {
     data object HvacTemp : VehicleSignal()
 
     companion object {
-        val all: List<VehicleSignal> = listOf(Speed, BatteryLevel, RangeKm, ChargePortOpen, HvacTemp)
+        /**
+         * Lazily built on purpose: if a caller touches a single data object first, its class
+         * initialisation runs the sealed parent's initialiser, where an eager list would capture
+         * that object's not-yet-assigned INSTANCE as null.
+         */
+        val all: List<VehicleSignal> by lazy {
+            listOf(Speed, BatteryLevel, RangeKm, ChargePortOpen, HvacTemp)
+        }
     }
 }
 

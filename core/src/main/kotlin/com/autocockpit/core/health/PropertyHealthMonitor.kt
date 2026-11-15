@@ -165,6 +165,11 @@ class PropertyHealthMonitor(
         }
     }
 
+    /** Evaluate every known signal without touching the frame counters (UI refresh). */
+    @Synchronized
+    fun evaluateAll(nowMillis: Long): Map<VehicleSignal, SignalView> =
+        VehicleSignal.all.associateWith { view(it, nowMillis) }
+
     /** Evaluate every known signal and count this frame for the degradation statistics. */
     @Synchronized
     fun observeFrame(nowMillis: Long): Map<VehicleSignal, SignalView> {
