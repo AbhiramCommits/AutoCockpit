@@ -1,0 +1,6 @@
+AutoCockpit instrumented test summary
+
+tests: 7  failures: 0  pass rate: 100.00%  wall time: 35.28s
+
+  app    com.autocockpit.app.GaugeAndSettingsTest                     tests=6 failures=0 time=32.18s
+  gauge  com.autocockpit.gauge.OffscreenGaugeBenchmark                tests=1 failures=0 time=3.10s

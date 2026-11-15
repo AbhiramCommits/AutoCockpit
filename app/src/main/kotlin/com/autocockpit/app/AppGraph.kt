@@ -18,7 +18,16 @@ import com.autocockpit.core.handoff.HandoffRepository
  */
 class AppGraph private constructor(context: Context) {
     private val appContext: Context = context
-    val clock: Clock = AndroidClock
+
+    @Volatile
+    @androidx.annotation.VisibleForTesting
+    var clockOverride: Clock? = null
+
+    @Volatile
+    @androidx.annotation.VisibleForTesting
+    var gatewayOverride: CarPropertyGateway? = null
+
+    val clock: Clock get() = clockOverride ?: AndroidClock
     val catalogRepository: MediaCatalogRepository = MediaCatalogRepository(context.assets)
     val catalog: Catalog by lazy { catalogRepository.load() }
     val handoffRepository: HandoffRepository = HandoffRepository()
@@ -27,13 +36,15 @@ class AppGraph private constructor(context: Context) {
     private val gatewaySelection: CarPropertyGatewayFactory.Selection =
         CarPropertyGatewayFactory.create(context, clock)
 
-    val gateway: CarPropertyGateway get() = gatewaySelection.gateway
+    val gateway: CarPropertyGateway get() = gatewayOverride ?: gatewaySelection.gateway
     val gatewayFallbackReason: String? get() = gatewaySelection.fallbackReason
 
     /** Gateway description with the factory's fallback banner folded in. */
-    val gatewayInfo: GatewayInfo get() = gateway.info.copy(
-        fallbackReason = gatewayFallbackReason ?: gateway.info.fallbackReason,
-    )
+    val gatewayInfo: GatewayInfo get() = if (gatewayOverride != null) {
+        gateway.info
+    } else {
+        gateway.info.copy(fallbackReason = gatewayFallbackReason ?: gateway.info.fallbackReason)
+    }
 
     private var gattServer: HandoffGattServer? = null
 
@@ -57,6 +68,14 @@ class AppGraph private constructor(context: Context) {
         /** Drops the singleton between Robolectric tests so state cannot leak. */
         fun resetForTests() {
             synchronized(this) { instance = null }
+        }
+
+        /** Restores production wiring between instrumented test classes. */
+        fun clearOverrides() {
+            instance?.apply {
+                gatewayOverride = null
+                clockOverride = null
+            }
         }
     }
 }

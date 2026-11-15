@@ -1,0 +1,26 @@
+{
+  "ran": true,
+  "tests": 7,
+  "failures": 0,
+  "passRate": 100.0,
+  "wallTimeSeconds": 35.28,
+  "suites": [
+    {
+      "module": "app",
+      "suite": "com.autocockpit.app.GaugeAndSettingsTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "timeSeconds": 32.18
+    },
+    {
+      "module": "gauge",
+      "suite": "com.autocockpit.gauge.OffscreenGaugeBenchmark",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "timeSeconds": 3.1
+    }
+  ],
+  "note": null
+}

@@ -8,28 +8,28 @@
     {
       "segments": 64,
       "verticesPerUpdate": 130,
-      "iterations": 269327,
-      "elapsedMs": 400.001,
-      "nanosPerUpdate": 1485.189,
-      "verticesPerMs": 87530.974,
+      "iterations": 190733,
+      "elapsedMs": 400.000,
+      "nanosPerUpdate": 2097.175,
+      "verticesPerMs": 61988.161,
       "allocationCount": 1
     },
     {
       "segments": 256,
       "verticesPerUpdate": 514,
-      "iterations": 75600,
-      "elapsedMs": 400.008,
-      "nanosPerUpdate": 5291.107,
-      "verticesPerMs": 97144.128,
+      "iterations": 56782,
+      "elapsedMs": 400.001,
+      "nanosPerUpdate": 7044.504,
+      "verticesPerMs": 72964.688,
       "allocationCount": 1
     },
     {
       "segments": 1024,
       "verticesPerUpdate": 2050,
-      "iterations": 12393,
-      "elapsedMs": 400.024,
-      "nanosPerUpdate": 32278.225,
-      "verticesPerMs": 63510.308,
+      "iterations": 15523,
+      "elapsedMs": 400.015,
+      "nanosPerUpdate": 25769.165,
+      "verticesPerMs": 79552.442,
       "allocationCount": 1
     }
   ]

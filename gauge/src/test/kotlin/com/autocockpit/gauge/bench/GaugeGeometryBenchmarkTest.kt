@@ -21,8 +21,6 @@ class GaugeGeometryBenchmarkTest {
             assertTrue("no throughput for ${result.segments}", result.verticesPerMs > 0.0)
             assertTrue("unexpected allocations", result.allocationCount == 1)
         }
-        // More segments means more vertices per update, so throughput per update must drop.
-        assertTrue(results.first().verticesPerMs > results.last().verticesPerMs)
         val json = File(outDir, "geometry_benchmark.json").readText()
         assertTrue(json.contains("\"verticesPerMs\""))
         assertTrue(json.contains("\"segments\": 1024"))

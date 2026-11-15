@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: JVM + Robolectric unit tests, lint, debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Unit tests, lint and debug APK
+        run: ./gradlew --no-daemon --console=plain :core:test :gauge:test :app:testDebugUnitTest lint assembleDebug
+
+      - name: Aggregate measured results
+        if: always()
+        run: python3 tools/metrics.py
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: |
+            core/build/reports/tests/
+            gauge/build/reports/tests/
+            app/build/reports/tests/
+            core/build/test-results/
+            gauge/build/test-results/
+            app/build/test-results/
+            results/
+          if-no-files-found: warn
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  instrumented:
+    name: AAOS emulator instrumented suite + GPU metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    # Delivery gate: this job is required, not best-effort. It depends on the Android Automotive
+    # system image being published for the runner. `reactivecircus/android-emulator-runner` installs
+    # system-images;android-33;android-automotive;x86_64. If that image is unavailable the job fails
+    # loudly instead of silently passing; fallbacks are documented in tools/emulator.sh
+    # (android-automotive-playstore, then android-34;google_apis, which cannot host this app because
+    # android.hardware.type.automotive is a required feature).
+    continue-on-error: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run instrumented tests on Android Automotive
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: android-automotive
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            adb shell pm grant com.autocockpit.app android.permission.BLUETOOTH_CONNECT || true
+            adb shell pm grant com.autocockpit.app android.permission.BLUETOOTH_ADVERTISE || true
+            ./gradlew --no-daemon --console=plain :app:connectedDebugAndroidTest
+            ./gradlew --no-daemon --console=plain :gauge:connectedDebugAndroidTest \
+              -Pandroid.testInstrumentationRunnerArguments.class=com.autocockpit.gauge.OffscreenGaugeBenchmark
+            for pkg in com.autocockpit.gauge.test com.autocockpit.app; do
+              adb exec-out run-as "$pkg" cat files/gauge_egl_benchmark.json > results/gauge_egl_benchmark_device.json 2>/dev/null || true
+              adb exec-out run-as "$pkg" cat files/gauge_frame_metrics.json > results/gauge_frame_metrics_device.json 2>/dev/null || true
+            done
+            adb logcat -d | grep -o "AUTOCOCKPIT_EGL_JSON:.*" | tail -1 | sed 's/^AUTOCOCKPIT_EGL_JSON://' > results/gauge_egl_benchmark_device.json || true
+            adb logcat -d | grep -o "AUTOCOCKPIT_FRAME_JSON:.*" | tail -1 | sed 's/^AUTOCOCKPIT_FRAME_JSON://' > results/gauge_frame_metrics_device.json || true
+            adb shell dumpsys gfxinfo com.autocockpit.app framestats > results/gfxinfo_framestats.txt || true
+            python3 tools/metrics.py
+
+      - name: Upload instrumented results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-results
+          path: |
+            results/
+            app/build/reports/androidTests/
+            gauge/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+            gauge/build/outputs/androidTest-results/
+          if-no-files-found: warn

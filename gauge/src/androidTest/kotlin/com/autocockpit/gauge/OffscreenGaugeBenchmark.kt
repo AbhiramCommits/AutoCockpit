@@ -51,24 +51,26 @@ class OffscreenGaugeBenchmark {
 
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             val out = File(context.filesDir, "gauge_egl_benchmark.json")
-            out.writeText(
-                """
-                {
-                  "source": "OffscreenGaugeBenchmark",
-                  "gpuSide": true,
-                  "width": 1024,
-                  "height": 1024,
-                  "warmupFrames": $WARMUP_FRAMES,
-                  "frames": $MEASURED_FRAMES,
-                  "totalMs": ${round3(totalMs)},
-                  "msPerFrame": ${round3(msPerFrame)},
-                  "fps": ${round3(1000.0 / msPerFrame)},
-                  "es3": ${renderer.useEs3},
-                  "glVersion": "${GLES20.glGetString(GLES20.GL_VERSION)?.replace("\"", "")}",
-                  "glRenderer": "${GLES20.glGetString(GLES20.GL_RENDERER)?.replace("\"", "")}"
-                }
-                """.trimIndent(),
-            )
+            val glVersion = GLES20.glGetString(GLES20.GL_VERSION)?.replace("\"", "") ?: "unknown"
+            val glRenderer = GLES20.glGetString(GLES20.GL_RENDERER)?.replace("\"", "") ?: "unknown"
+            val payload = "{" +
+                "\"source\":\"OffscreenGaugeBenchmark\"," +
+                "\"gpuSide\":true," +
+                "\"width\":1024," +
+                "\"height\":1024," +
+                "\"warmupFrames\":$WARMUP_FRAMES," +
+                "\"frames\":$MEASURED_FRAMES," +
+                "\"totalMs\":${round3(totalMs)}," +
+                "\"msPerFrame\":${round3(msPerFrame)}," +
+                "\"fps\":${round3(1000.0 / msPerFrame)}," +
+                "\"es3\":${renderer.useEs3}," +
+                "\"glVersion\":\"$glVersion\"," +
+                "\"glRenderer\":\"$glRenderer\"" +
+                "}"
+            out.writeText(payload)
+            // The test APK is uninstalled after the run, so also emit the JSON to logcat for
+            // tools/emulator.sh and CI to harvest.
+            android.util.Log.i("AutoCockpitBenchmark", "AUTOCOCKPIT_EGL_JSON:$payload")
             assertTrue(out.exists())
             assertTrue("renderer drew no frames", renderer.frameCount >= WARMUP_FRAMES + MEASURED_FRAMES)
             println("offscreen EGL gauge: ${"%.3f".format(msPerFrame)} ms/frame over $MEASURED_FRAMES frames -> ${out.path}")

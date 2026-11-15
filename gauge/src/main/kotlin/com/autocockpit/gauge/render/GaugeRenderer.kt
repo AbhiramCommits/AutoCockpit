@@ -256,14 +256,15 @@ class GaugeRenderer(
         internal fun fragmentSource(es3: Boolean): String {
             val header = if (es3) "#version 300 es\nprecision mediump float;\nout vec4 fragColor;\n" else "precision mediump float;\n"
             val colorOut = if (es3) "fragColor" else "gl_FragColor"
+            val varying = if (es3) "in" else "varying"
             return header + """
                 uniform float uValue;
                 uniform float uInner;
                 uniform float uOuter;
                 uniform float uDegraded;
-                varying vec2 vPos;
-                varying vec4 vColor;
-                varying float vValue;
+                $varying vec2 vPos;
+                $varying vec4 vColor;
+                $varying float vValue;
 
                 vec3 ramp(float t) {
                     vec3 regen = vec3(0.18, 0.86, 0.62);

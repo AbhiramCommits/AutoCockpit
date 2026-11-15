@@ -8,7 +8,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export ROOT
 
 # --- JDK 17 -----------------------------------------------------------------
-if [[ -z "${JAVA_HOME:-}" || ! -x "${JAVA_HOME}/bin/java" ]]; then
+# Prefer JDK 17 even when the ambient JAVA_HOME points at a newer JDK.
+if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+  CURRENT_MAJOR="$("${JAVA_HOME}/bin/java" -version 2>&1 | sed -n 's/.*version "\([0-9]*\).*/\1/p' | head -1)"
+else
+  CURRENT_MAJOR=""
+fi
+if [[ "${CURRENT_MAJOR}" != "17" ]]; then
   for candidate in \
     "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" \
     "/usr/lib/jvm/java-17-openjdk-amd64" \

@@ -52,6 +52,13 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
 }
 
+// :gauge:test only needs the debug variant; the benchmark runs once per build.
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variant ->
+        variant.enableUnitTest = false
+    }
+}
+
 tasks.withType<Test>().configureEach {
     // The geometry micro-benchmark writes its measured JSON into the repository results dir.
     systemProperty("autocockpit.resultsDir", rootProject.file("results").absolutePath)

@@ -1,0 +1,175 @@
+{
+  "tests": 234,
+  "failures": 0,
+  "passRate": 100.0,
+  "wallTimeSeconds": 6.86,
+  "modules": {
+    "core": {
+      "tests": 160,
+      "failures": 0,
+      "errors": 0,
+      "passRate": 100.0,
+      "wallTimeSeconds": 1.68,
+      "suites": [
+        {
+          "suite": "com.autocockpit.core.BuildInfoTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.0
+        },
+        {
+          "suite": "com.autocockpit.core.codec.ChunkerTest",
+          "tests": 24,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.1
+        },
+        {
+          "suite": "com.autocockpit.core.codec.HandoffCodecTest",
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.4
+        },
+        {
+          "suite": "com.autocockpit.core.handoff.CompanionClientTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.4
+        },
+        {
+          "suite": "com.autocockpit.core.handoff.HandoffProtocolTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.0
+        },
+        {
+          "suite": "com.autocockpit.core.handoff.HandoffServerCoreTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.02
+        },
+        {
+          "suite": "com.autocockpit.core.health.PropertyHealthMonitorTest",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.03
+        },
+        {
+          "suite": "com.autocockpit.core.link.LinkStateMachineTest",
+          "tests": 23,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.02
+        },
+        {
+          "suite": "com.autocockpit.core.playback.MediaPlaybackEngineTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.01
+        },
+        {
+          "suite": "com.autocockpit.core.simulation.SimulationHarnessTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.71
+        },
+        {
+          "suite": "com.autocockpit.core.simulation.StatsTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.0
+        }
+      ]
+    },
+    "gauge": {
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "passRate": 100.0,
+      "wallTimeSeconds": 2.17,
+      "suites": [
+        {
+          "suite": "com.autocockpit.gauge.bench.GaugeGeometryBenchmarkTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 2.08
+        },
+        {
+          "suite": "com.autocockpit.gauge.math.GaugeGeometryTest",
+          "tests": 18,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.05
+        },
+        {
+          "suite": "com.autocockpit.gauge.render.FrameTimeTrackerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.03
+        }
+      ]
+    },
+    "app": {
+      "tests": 46,
+      "failures": 0,
+      "errors": 0,
+      "passRate": 100.0,
+      "wallTimeSeconds": 3.01,
+      "suites": [
+        {
+          "suite": "com.autocockpit.app.car.CarPropertyGatewayFactoryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 2.34
+        },
+        {
+          "suite": "com.autocockpit.app.link.CompanionLinkControllerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.01
+        },
+        {
+          "suite": "com.autocockpit.app.media.MediaBrowseTreeTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.17
+        },
+        {
+          "suite": "com.autocockpit.app.media.MediaBrowserServiceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.42
+        },
+        {
+          "suite": "com.autocockpit.app.ui.GaugeViewModelTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.06
+        },
+        {
+          "suite": "com.autocockpit.app.ui.SettingsViewModelTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "timeSeconds": 0.02
+        }
+      ]
+    }
+  }
+}

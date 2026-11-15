@@ -1,0 +1,22 @@
+{
+  "source": "FrameTimeTracker (device, Choreographer)",
+  "jankThresholdMs": 16.67,
+  "count": 300,
+  "meanMs": 20.28,
+  "p50Ms": 16.67,
+  "p95Ms": 33.33,
+  "p99Ms": 83.33,
+  "maxMs": 300.0,
+  "jankFrames": 22,
+  "jankPct": 7.33,
+  "windowCapacity": 2048,
+  "offscreenEgl": {
+    "source": "OffscreenGaugeBenchmark (EGL pbuffer)",
+    "frames": 1000,
+    "totalMs": 2496.942,
+    "msPerFrame": 2.497,
+    "fps": 400.49,
+    "es3": true,
+    "glRenderer": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver-5.0.0))"
+  }
+}

@@ -38,6 +38,11 @@ import com.autocockpit.app.ui.vm.GaugeViewModel
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        /** Instrumented tests opt out of the runtime BLE permission dialog. */
+        const val EXTRA_SKIP_COMPANION_LINK: String = "com.autocockpit.app.SKIP_COMPANION_LINK"
+    }
+
     private val bluetoothPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) {
@@ -47,7 +52,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startCompanionLinkIfPermitted()
+        if (!intent.getBooleanExtra(EXTRA_SKIP_COMPANION_LINK, false)) {
+            startCompanionLinkIfPermitted()
+        }
         setContent {
             AutoCockpitTheme {
                 val graph = remember { AppGraph.get(applicationContext) }
