@@ -29,6 +29,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 
+tasks.named<JavaExec>("run") {
+    // Relative --out paths resolve against the repository root, like every other tool.
+    workingDir = rootProject.projectDir
+}
+
 tasks.test {
     useJUnit()
     maxHeapSize = "1g"

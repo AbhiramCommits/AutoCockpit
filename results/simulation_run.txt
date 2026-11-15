@@ -1,0 +1,27 @@
+> Task :core:checkKotlinGradlePluginConfigurationErrors
+> Task :core:processResources NO-SOURCE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:compileKotlin
+> Task :core:compileJava NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:compileTestKotlin UP-TO-DATE
+> Task :core:compileTestJava NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :core:test
+
+> Task :core:run
+AutoCockpit simulation 0.7.0 (schema 1)
+  seed 42, 500 sessions x 4 loss rates = 2000 sessions
+  wall time 5099.37 ms (2549.68 us/session)
+  handoff success 100.0% (2000/2000), retransmits mean 97.42 p95 358.0
+  reconnect attempts mean 1.0 p95 1.0; recovery mean 657.32ms p95 890.0ms
+    loss 0%: success 100.00%, retransmits mean 18.35 p95 38, recovery mean 659.94ms p95 880ms
+    loss 1%: success 100.00%, retransmits mean 36.48 p95 71, recovery mean 656.44ms p95 886ms
+    loss 5%: success 100.00%, retransmits mean 110.88 p95 218, recovery mean 668.70ms p95 910ms
+    loss 10%: success 100.00%, retransmits mean 223.99 p95 426, recovery mean 643.91ms p95 878ms
+  degradation frames 1200000: LIVE 84.18% LAST_KNOWN 11.73% UNAVAILABLE 4.09%
+  payload 500 tracks: 48002 bytes, 3001 chunks at MTU 20
+  wrote results/simulation.json
+
+BUILD SUCCESSFUL in 8s
+5 actionable tasks: 4 executed, 1 up-to-date
