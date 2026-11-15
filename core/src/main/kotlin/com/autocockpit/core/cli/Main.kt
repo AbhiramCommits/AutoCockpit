@@ -1,6 +1,7 @@
 package com.autocockpit.core.cli
 
 import com.autocockpit.core.BuildInfo
+import com.autocockpit.core.handoff.HandoffProtocol
 import com.autocockpit.core.simulation.SimulationConfig
 import com.autocockpit.core.simulation.SimulationHarness
 import com.autocockpit.core.simulation.SimulationReport
@@ -45,7 +46,7 @@ private fun printUsage() {
           --sessions N      sessions per loss rate (default 500)
           --seed S          RNG seed (default 42)
           --loss L[,L...]   chunk loss rates, e.g. 0,0.01,0.05,0.10
-          --mtu N           ATT payload size (default 20)
+          --mtu N           requested ATT MTU (default 185)
           --tracks N        maximum tracks per session (default 500)
           --out PATH        JSON output path (default results/simulation.json)
         """.trimIndent(),
@@ -59,7 +60,7 @@ private fun runSimulate(args: List<String>) {
     }
     var sessions = 500
     var seed = 42L
-    var mtu = BuildInfo.DEFAULT_ATT_PAYLOAD_BYTES
+    var mtu = HandoffProtocol.REQUESTED_MTU
     var maxTracks = 500
     var out = "results/simulation.json"
     var lossRates = listOf(0.0, 0.01, 0.05, 0.10)
@@ -126,6 +127,6 @@ private fun printSummary(report: SimulationReport, elapsedMs: Double, path: Stri
     }
     val degradation = report.degradation
     println("  degradation frames ${degradation.framesObserved}: LIVE ${degradation.livePct}% LAST_KNOWN ${degradation.lastKnownPct}% UNAVAILABLE ${degradation.unavailablePct}%")
-    println("  payload 500 tracks: ${report.payload.fiveHundredTrackBytes} bytes, ${report.payload.fiveHundredTrackChunksAt20} chunks at MTU ${report.config.mtu}")
+    println("  payload 500 tracks: ${report.payload.fiveHundredTrackBytes} bytes, ${report.payload.fiveHundredTrackChunksAt20} chunks at the 20-byte ATT payload")
     println("  wrote $path")
 }

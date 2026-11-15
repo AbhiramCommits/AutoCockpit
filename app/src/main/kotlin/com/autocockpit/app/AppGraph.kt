@@ -7,6 +7,7 @@ import com.autocockpit.app.car.GatewayInfo
 import com.autocockpit.app.clock.AndroidClock
 import com.autocockpit.app.clock.Clock
 import com.autocockpit.app.link.CompanionLinkController
+import com.autocockpit.app.link.HandoffGattServer
 import com.autocockpit.app.media.Catalog
 import com.autocockpit.app.media.MediaCatalogRepository
 import com.autocockpit.core.handoff.HandoffRepository
@@ -16,6 +17,7 @@ import com.autocockpit.core.handoff.HandoffRepository
  * the boundaries that make the app headless-testable, so no annotation processor is needed.
  */
 class AppGraph private constructor(context: Context) {
+    private val appContext: Context = context
     val clock: Clock = AndroidClock
     val catalogRepository: MediaCatalogRepository = MediaCatalogRepository(context.assets)
     val catalog: Catalog by lazy { catalogRepository.load() }
@@ -32,6 +34,16 @@ class AppGraph private constructor(context: Context) {
     val gatewayInfo: GatewayInfo get() = gateway.info.copy(
         fallbackReason = gatewayFallbackReason ?: gateway.info.fallbackReason,
     )
+
+    private var gattServer: HandoffGattServer? = null
+
+    /** Starts the BLE peripheral (idempotent). Returns the visible status string. */
+    fun startCompanionLink(): String {
+        val server = gattServer ?: HandoffGattServer(appContext, handoffRepository).also { gattServer = it }
+        return server.start()
+    }
+
+    fun companionLinkStatus(): String = gattServer?.status ?: "stopped" 
 
     companion object {
         @Volatile

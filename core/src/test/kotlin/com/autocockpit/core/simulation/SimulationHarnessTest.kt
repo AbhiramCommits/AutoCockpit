@@ -91,7 +91,8 @@ class SimulationHarnessTest {
         assertEquals(fiveHundred.size, report.payload.fiveHundredTrackBytes)
         assertEquals(Chunker(20).split(fiveHundred).size, report.payload.fiveHundredTrackChunksAt20)
         assertEquals(
-            fiveHundred.size + report.payload.fiveHundredTrackChunksAt20 * Chunker.CHUNK_HEADER_BYTES,
+            fiveHundred.size + report.payload.fiveHundredTrackChunksAt20 *
+                (Chunker.CHUNK_HEADER_BYTES + com.autocockpit.core.handoff.HandoffProtocol.ATT_HEADER_BYTES),
             report.handoff.bytesOnWire500Tracks,
         )
         assertEquals(500, report.handoff.maxPayloadTracks)
@@ -128,8 +129,8 @@ class SimulationHarnessTest {
         val report = SimulationHarness(smallConfig).run()
         val frame = report.payload.fiveHundredTrackBytes
         val chunks = report.payload.fiveHundredTrackChunksAt20
-        // Every chunk adds a 4-byte header on top of the frame bytes.
-        assertEquals(frame + chunks * 4, report.handoff.bytesOnWire500Tracks)
+        // Every chunk adds a 4-byte protocol header and a 3-byte ATT header.
+        assertEquals(frame + chunks * 7, report.handoff.bytesOnWire500Tracks)
         assertTrue(chunks > frame / 20)
     }
 

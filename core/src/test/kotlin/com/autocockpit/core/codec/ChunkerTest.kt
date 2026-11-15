@@ -192,6 +192,15 @@ class ChunkerTest {
     }
 
     @Test
+    fun expectedTotalMakesEveryChunkMissingBeforeArrival() {
+        val reassembler = Reassembler()
+        reassembler.expectTotal(4)
+        assertEquals(4, reassembler.totalChunks)
+        assertEquals(listOf(0, 1, 2, 3), reassembler.missing())
+        assertFalse(reassembler.isComplete())
+    }
+
+    @Test
     fun resetClearsPartialState() {
         val chunks = Chunker(20).split(HandoffCodec.encode(TestPayloads.payload(4)))
         val reassembler = Reassembler()

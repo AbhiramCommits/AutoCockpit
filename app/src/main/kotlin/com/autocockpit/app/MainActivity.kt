@@ -1,7 +1,11 @@
 package com.autocockpit.app
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,13 +37,43 @@ import com.autocockpit.app.ui.theme.AutoCockpitTheme
 import com.autocockpit.app.ui.vm.GaugeViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val bluetoothPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) {
+        // Even a denied request leaves the rest of the cockpit usable.
+        AppGraph.get(applicationContext).startCompanionLink()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startCompanionLinkIfPermitted()
         setContent {
             AutoCockpitTheme {
                 val graph = remember { AppGraph.get(applicationContext) }
                 AutoCockpitApp(graph)
             }
+        }
+    }
+
+    private fun startCompanionLinkIfPermitted() {
+        val graph = AppGraph.get(applicationContext)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            graph.startCompanionLink()
+            return
+        }
+        val granted = arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE)
+            .all { checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
+        if (granted) {
+            graph.startCompanionLink()
+        } else {
+            bluetoothPermissions.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                ),
+            )
         }
     }
 }

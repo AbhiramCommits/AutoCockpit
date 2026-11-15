@@ -151,6 +151,12 @@ class Reassembler {
 
     fun offer(chunk: Chunk): ChunkAck = offer(chunk.index, chunk.total, chunk.data)
 
+    /** Declares the expected chunk count before any chunk arrives (from a BEGIN control frame). */
+    fun expectTotal(total: Int) {
+        require(total > 0) { "total must be positive: $total" }
+        if (declaredTotal < 0) declaredTotal = total
+    }
+
     fun isComplete(): Boolean = declaredTotal > 0 && parts.size == declaredTotal
 
     fun missing(): List<Int> {

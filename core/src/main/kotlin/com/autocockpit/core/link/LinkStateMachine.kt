@@ -365,6 +365,9 @@ class LinkStateMachine(
 
     fun history(): List<Transition> = history.toList()
 
+    /** Retry budget from the configured policy (used by the BLE client). */
+    val maxAttempts: Int get() = policy.maxAttempts
+
     fun reset() {
         on(LinkEvent.Reset)
     }

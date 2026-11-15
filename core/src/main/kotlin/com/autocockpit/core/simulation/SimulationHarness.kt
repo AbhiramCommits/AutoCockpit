@@ -1,11 +1,8 @@
 package com.autocockpit.core.simulation
 
 import com.autocockpit.core.BuildInfo
-import com.autocockpit.core.codec.Chunk
 import com.autocockpit.core.codec.Chunker
-import com.autocockpit.core.codec.DecodeResult
 import com.autocockpit.core.codec.HandoffCodec
-import com.autocockpit.core.codec.Reassembler
 import com.autocockpit.core.domain.DriverProfile
 import com.autocockpit.core.domain.HandoffPayload
 import com.autocockpit.core.domain.MediaQueue
@@ -15,12 +12,17 @@ import com.autocockpit.core.domain.SeatPosition
 import com.autocockpit.core.domain.SignalSample
 import com.autocockpit.core.domain.UiTier
 import com.autocockpit.core.domain.VehicleSignal
+import com.autocockpit.core.handoff.CompanionClient
+import com.autocockpit.core.handoff.HandoffProtocol
+import com.autocockpit.core.handoff.HandoffRepository
+import com.autocockpit.core.handoff.HandoffServerCore
+import com.autocockpit.core.handoff.LoopbackTransport
+import com.autocockpit.core.handoff.LossyTransport
+import com.autocockpit.core.handoff.SimulatedClock
 import com.autocockpit.core.health.DegradationCounters
 import com.autocockpit.core.health.DegradationPolicy
 import com.autocockpit.core.health.PropertyHealthMonitor
 import com.autocockpit.core.link.BackoffPolicy
-import com.autocockpit.core.link.LinkEffect
-import com.autocockpit.core.link.LinkEvent
 import com.autocockpit.core.link.LinkStateMachine
 import kotlin.math.sin
 import kotlin.random.Random
@@ -79,7 +81,8 @@ object SyntheticPayloads {
 data class SimulationConfig(
     val sessionsPerLossRate: Int = 500,
     val seed: Long = 42L,
-    val mtu: Int = BuildInfo.DEFAULT_ATT_PAYLOAD_BYTES,
+    /** Requested ATT MTU for the handoff channel (the real client uses 185). */
+    val mtu: Int = HandoffProtocol.REQUESTED_MTU,
     val lossRates: List<Double> = listOf(0.0, 0.01, 0.05, 0.10),
     val maxTracks: Int = 500,
     val bleDisconnectRate: Double = 0.25,
@@ -95,7 +98,7 @@ data class SimulationConfig(
         require(sessionsPerLossRate > 0)
         require(lossRates.isNotEmpty())
         require(lossRates.all { it in 0.0..1.0 })
-        require(mtu in Chunker.MIN_MTU..Chunker.MAX_MTU)
+        require(mtu in HandoffProtocol.DEFAULT_MTU..HandoffProtocol.MAX_MTU)
         require(maxTracks in 1..5000)
     }
 }
@@ -111,15 +114,8 @@ private class FaultTally {
     var outOfOrderChunks = 0
     var reconnectExhaustions = 0
     var schemaAborts = 0
+    var crcRestarts = 0
 }
-
-private data class TransferOutcome(
-    val success: Boolean,
-    val retransmits: Int,
-    val reconnectAttempts: Int,
-    val recoveryLatencyMs: Long,
-    val bytesOnWire: Int,
-)
 
 private data class DegradationOutcome(
     val counters: DegradationCounters,
@@ -129,24 +125,28 @@ private data class DegradationOutcome(
 /**
  * Headless, deterministic closed-loop simulation of the AutoCockpit data paths.
  *
- * Every session encodes a synthetic phone payload, chunks it at the configured MTU, pushes the
- * chunks through a seeded loss/corruption/disconnect model, reassembles and verifies the frame
- * CRC, while a [LinkStateMachine] supplies reconnect attempts and backoff delays. In parallel a
- * [PropertyHealthMonitor] is driven through dropouts and stale samples so the report can show
- * how many signal frames the cockpit serves as LIVE, LAST_KNOWN or UNAVAILABLE.
+ * The handoff is not modelled abstractly: every session runs the real [CompanionClient] against a
+ * real [HandoffServerCore] through [LossyTransport] on top of [LoopbackTransport]. Chunk drops,
+ * corrupted frames and mid-transfer disconnects therefore exercise the production codec, chunker,
+ * CRC, retransmit, resume and idempotent-commit paths. In parallel a [PropertyHealthMonitor] is
+ * driven through dropouts, stale samples and error bursts so the report can show how many signal
+ * frames the cockpit serves as LIVE, LAST_KNOWN or UNAVAILABLE.
  *
- * The same seed and config always produce byte-identical JSON: the clock is the simulated
- * epoch, never the wall clock.
+ * The same seed and config always produce byte-identical JSON: the clock is a simulated epoch,
+ * never the wall clock.
  */
 class SimulationHarness(private val config: SimulationConfig = SimulationConfig()) {
 
     fun run(): SimulationReport {
         val faults = FaultTally()
-        val chunker = Chunker(config.mtu)
+        val repository = HandoffRepository()
+        val server = HandoffServerCore(repository)
 
+        // Payload statistics are always reported at the 20-byte ATT payload (MTU 23).
+        val payloadChunker = Chunker(BuildInfo.DEFAULT_ATT_PAYLOAD_BYTES)
         val maxPayload = SyntheticPayloads.canonical(500)
         val maxFrame = HandoffCodec.encode(maxPayload)
-        val maxChunks = chunker.split(maxFrame)
+        val maxChunks = payloadChunker.split(maxFrame)
 
         val allRetransmits = ArrayList<Long>()
         val allAttempts = ArrayList<Long>()
@@ -158,7 +158,6 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
 
         val degradationCounters = ArrayList<DegradationCounters>()
         val degradationRecovery = ArrayList<Long>()
-
         val byRate = ArrayList<LossRateHandoff>()
 
         config.lossRates.forEachIndexed { rateIndex, lossRate ->
@@ -176,22 +175,55 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
                 val payload = SyntheticPayloads.random(rng, trackCount, generatedAt)
                 val frame = HandoffCodec.encode(payload)
                 if (frame.size > maxFrameBytesSeen) maxFrameBytesSeen = frame.size
-                val chunks = chunker.split(frame)
-                val outcome = transfer(chunks, payload, lossRate, rng, faults)
 
-                if (outcome.success) succeeded++
-                if (outcome.reconnectAttempts > 0) reconnected++
-                rateRetransmits += outcome.retransmits.toLong()
-                rateBytes += outcome.bytesOnWire.toLong()
-                if (outcome.reconnectAttempts > 0) {
-                    rateAttempts += outcome.reconnectAttempts.toLong()
-                    rateRecovery += outcome.recoveryLatencyMs
+                val clock = SimulatedClock(config.epochMillis)
+                val loopback = LoopbackTransport(server, clock)
+                val expectedChunks = Chunker(config.mtu - HandoffProtocol.ATT_HEADER_BYTES)
+                    .split(frame).size
+                val disconnectAfter = if (rng.nextDouble() < config.bleDisconnectRate) {
+                    1 + rng.nextInt(expectedChunks.coerceAtLeast(1))
+                } else {
+                    Int.MAX_VALUE
+                }
+                val transport = LossyTransport(
+                    delegate = loopback,
+                    dropRate = lossRate,
+                    corruptRate = config.crcCorruptionRate,
+                    disconnectAfterChunks = disconnectAfter,
+                    seed = rng.nextLong(),
+                )
+                val client = CompanionClient(
+                    transport = transport,
+                    link = LinkStateMachine(config.backoff, Random(rng.nextLong())),
+                    requestedMtu = config.mtu,
+                )
+                val transferId = 1L + rateIndex * 1_000_000L + session
+                val result = client.send(payload, transferId)
+
+                faults.chunkLosses += transport.droppedChunks
+                faults.crcCorruptions += transport.corruptedChunks
+                faults.bleDisconnects += transport.injectedDisconnects
+                faults.crcRestarts += result.restarts
+                if (result.failureReason?.contains("reconnect budget") == true) faults.reconnectExhaustions++
+
+                val success = result.success && repository.current() == payload
+                if (success) succeeded++
+                if (result.reconnectAttempts > 0) reconnected++
+                rateRetransmits += result.retransmits.toLong()
+                rateBytes += result.bytesTransferred.toLong()
+                if (result.reconnectAttempts > 0) {
+                    rateAttempts += result.reconnectAttempts.toLong()
+                    rateRecovery += result.recoveryLatencyMs
                 }
 
                 val degradation = simulateDegradation(rng, faults)
                 degradationCounters += degradation.counters
                 degradationRecovery += degradation.recoveryLatenciesMs
             }
+
+            faults.duplicateChunks = server.duplicateChunks
+            faults.outOfOrderChunks = server.outOfOrderChunks
+            faults.schemaAborts = server.schemaAborts
 
             totalSessions += config.sessionsPerLossRate
             totalSucceeded += succeeded
@@ -218,23 +250,21 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
         val totalLastKnown = degradationCounters.sumOf { it.lastKnownFrames }
         val totalUnavailable = degradationCounters.sumOf { it.unavailableFrames }
 
-        val build = BuildSection(
-            app = BuildInfo.APP_NAME,
-            version = BuildInfo.VERSION,
-            schemaVersion = BuildInfo.SCHEMA_VERSION,
-            jvm = System.getProperty("java.version") ?: "unknown",
-            os = "${System.getProperty("os.name")} ${System.getProperty("os.arch")}",
-        )
-
         return SimulationReport(
-            build = build,
+            build = BuildSection(
+                app = BuildInfo.APP_NAME,
+                version = BuildInfo.VERSION,
+                schemaVersion = BuildInfo.SCHEMA_VERSION,
+                jvm = System.getProperty("java.version") ?: "unknown",
+                os = "${System.getProperty("os.name")} ${System.getProperty("os.arch")}",
+            ),
             config = ConfigSection(
                 seed = config.seed,
                 sessionsPerLossRate = config.sessionsPerLossRate,
                 totalSessions = totalSessions,
                 lossRates = config.lossRates,
                 mtu = config.mtu,
-                chunkPayloadBytes = chunker.chunkPayloadBytes,
+                chunkPayloadBytes = config.mtu - HandoffProtocol.ATT_HEADER_BYTES - Chunker.CHUNK_HEADER_BYTES,
                 tracksPerSession = "1..${config.maxTracks} uniform",
                 staleAfterMillis = DegradationPolicy().staleAfterMillis,
                 unavailableAfterMillis = DegradationPolicy().unavailableAfterMillis,
@@ -262,9 +292,9 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
                 sessionsWithReconnect = sessionsWithReconnect,
                 byLossRate = byRate,
                 maxPayloadBytes = maxFrameBytesSeen,
-                // The payload section always encodes the canonical 500-track queue.
                 maxPayloadTracks = 500,
-                bytesOnWire500Tracks = maxFrame.size + maxChunks.size * Chunker.CHUNK_HEADER_BYTES,
+                bytesOnWire500Tracks = maxFrame.size +
+                    maxChunks.size * (Chunker.CHUNK_HEADER_BYTES + HandoffProtocol.ATT_HEADER_BYTES),
                 chunks500Tracks = maxChunks.size,
                 frameHeaderBytes = HandoffCodec.HEADER_BYTES,
                 chunkHeaderBytes = Chunker.CHUNK_HEADER_BYTES,
@@ -288,100 +318,6 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
                 fiveHundredTrackChunksAt20 = maxChunks.size,
             ),
         )
-    }
-
-    /**
-     * One handoff through the link. The state machine is real: disconnects produce BACKOFF
-     * transitions whose scheduled delay is charged to the recovery latency, and the next round
-     * resends only the chunks the reassembler reports missing (resume-from-chunk-N).
-     */
-    private fun transfer(
-        chunks: List<Chunk>,
-        payload: HandoffPayload,
-        lossRate: Double,
-        rng: Random,
-        faults: FaultTally,
-    ): TransferOutcome {
-        val machine = LinkStateMachine(config.backoff, Random(rng.nextLong()))
-        machine.on(LinkEvent.StartRequested)
-        machine.on(LinkEvent.PeerDiscovered)
-        machine.on(LinkEvent.Connected)
-        machine.on(LinkEvent.MtuNegotiated(config.mtu + ATT_HEADER_BYTES))
-
-        val reassembler = Reassembler()
-        var retransmits = 0
-        var attempts = 0
-        var recoveryMs = 0L
-        var bytes = 0
-        var exhausted = false
-
-        val disconnectAt: Int = if (chunks.size > 4 && rng.nextDouble() < config.bleDisconnectRate) {
-            chunks.size / 3 + rng.nextInt(kotlin.math.max(1, chunks.size / 3))
-        } else {
-            -1
-        }
-        var sent = 0
-        var round = 0
-        val everSent = HashSet<Int>()
-        while (round < MAX_ROUNDS && !exhausted) {
-            val missing = if (round == 0) chunks.map { it.index }.toSet() else reassembler.missing().toSet()
-            if (missing.isEmpty()) break
-            var droppedLink = false
-            for (chunk in chunks) {
-                if (chunk.index !in missing) continue
-
-                if (sent == disconnectAt) {
-                    // The chunk in flight is lost with the link; it is retransmitted from the
-                    // missing set after reconnecting. Advancing `sent` prevents the same ordinal
-                    // triggering a disconnect on every subsequent round.
-                    sent++
-                    faults.bleDisconnects++
-                    val lost = machine.on(LinkEvent.LinkLost)
-                    if (lost.snapshot.exhausted) {
-                        exhausted = true
-                        faults.reconnectExhaustions++
-                        break
-                    }
-                    val delay = lost.effects.filterIsInstance<LinkEffect.ScheduleReconnect>()
-                        .firstOrNull()?.delayMillis ?: config.backoff.baseMillis
-                    attempts++
-                    recoveryMs += delay + 120L + rng.nextInt(80)
-                    machine.on(LinkEvent.ReconnectTick)
-                    machine.on(LinkEvent.PeerDiscovered)
-                    machine.on(LinkEvent.Connected)
-                    machine.on(LinkEvent.MtuNegotiated(config.mtu + ATT_HEADER_BYTES))
-                    droppedLink = true
-                    break
-                }
-                sent++
-                if (!everSent.add(chunk.index)) retransmits++
-                bytes += Chunker.CHUNK_HEADER_BYTES + chunk.data.size
-
-                if (rng.nextDouble() < lossRate) {
-                    faults.chunkLosses++
-                    continue
-                }
-                if (rng.nextDouble() < config.crcCorruptionRate) {
-                    faults.crcCorruptions++
-                    continue
-                }
-                reassembler.offer(chunk)
-            }
-            if (exhausted) break
-            if (!droppedLink && reassembler.isComplete()) break
-            round++
-        }
-
-        machine.on(LinkEvent.SyncCompleted)
-        val snapshot = reassembler.snapshot()
-        faults.duplicateChunks += snapshot.duplicateChunks
-        faults.outOfOrderChunks += snapshot.outOfOrderChunks
-
-        val decoded = reassembler.reassemble()
-        val success = reassembler.isComplete() &&
-            decoded is DecodeResult.Success &&
-            decoded.payload == payload
-        return TransferOutcome(success, retransmits, attempts, recoveryMs, bytes)
     }
 
     /** Drives the health monitor through a 12-second synthetic drive with dropouts and stale data. */
@@ -426,9 +362,7 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
                 if (window != null) {
                     recovering.putIfAbsent(signal, config.epochMillis + (window.endFrame + 1) * frameMs)
                 }
-                monitor.onSample(
-                    SignalSample(signal, rawValue(signal, frame), now, status),
-                )
+                monitor.onSample(SignalSample(signal, rawValue(signal, frame), now, status))
             }
             val views = monitor.observeFrame(now)
             for (signal in signals) {
@@ -451,12 +385,5 @@ class SimulationHarness(private val config: SimulationConfig = SimulationConfig(
             is VehicleSignal.ChargePortOpen -> if (frame % 60 < 30) 1.0 else 0.0
             is VehicleSignal.HvacTemp -> 21.5 + 1.2 * wobble
         }
-    }
-
-    companion object {
-        const val MAX_ROUNDS: Int = 10
-
-        /** ATT payload = MTU - 3 (opcode + handle); the link negotiates MTU, the chunker uses payload. */
-        const val ATT_HEADER_BYTES: Int = 3
     }
 }

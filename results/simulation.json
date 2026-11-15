@@ -16,22 +16,22 @@
             0.05,
             0.1
         ],
-        "mtu": 20,
-        "chunkPayloadBytes": 16,
+        "mtu": 185,
+        "chunkPayloadBytes": 178,
         "tracksPerSession": "1..500 uniform",
         "staleAfterMillis": 3000,
         "unavailableAfterMillis": 12000,
         "simulatedClockEpochMillis": 1700000000000
     },
     "faults": {
-        "propertyDropouts": 3502,
-        "staleSamples": 138328,
-        "propertyErrors": 5794,
-        "bleDisconnects": 500,
-        "chunkLosses": 158633,
-        "crcCorruptions": 36214,
+        "propertyDropouts": 3435,
+        "staleSamples": 138143,
+        "propertyErrors": 5833,
+        "bleDisconnects": 513,
+        "chunkLosses": 14012,
+        "crcCorruptions": 3202,
         "duplicateChunks": 0,
-        "outOfOrderChunks": 178800,
+        "outOfOrderChunks": 15705,
         "reconnectExhaustions": 0,
         "schemaAborts": 0
     },
@@ -40,7 +40,7 @@
         "succeeded": 2000,
         "successRate": 100.0,
         "meanReconnectAttempts": {
-            "count": 500,
+            "count": 513,
             "mean": 1.0,
             "p50": 1.0,
             "p95": 1.0,
@@ -48,39 +48,39 @@
             "max": 1.0
         },
         "meanRecoveryLatencyMs": {
-            "count": 500,
-            "mean": 657.32,
-            "p50": 651.0,
-            "p95": 890.0,
-            "p99": 917.0,
-            "max": 934.0
+            "count": 513,
+            "mean": 498.25,
+            "p50": 500.0,
+            "p95": 717.0,
+            "p99": 745.0,
+            "max": 750.0
         },
         "chunkRetransmits": {
             "count": 2000,
-            "mean": 97.42,
-            "p50": 48.0,
-            "p95": 358.0,
-            "p99": 428.0,
-            "max": 469.0
+            "mean": 7.62,
+            "p50": 4.0,
+            "p95": 29.0,
+            "p99": 40.0,
+            "max": 54.0
         },
-        "sessionsWithReconnect": 500,
+        "sessionsWithReconnect": 513,
         "byLossRate": [
             {
                 "lossRate": 0.0,
                 "sessions": 500,
                 "succeeded": 500,
                 "successRate": 100.0,
-                "reconnectSessions": 121,
+                "reconnectSessions": 136,
                 "retransmits": {
                     "count": 500,
-                    "mean": 18.35,
-                    "p50": 18.0,
-                    "p95": 38.0,
-                    "p99": 43.0,
-                    "max": 52.0
+                    "mean": 1.36,
+                    "p50": 1.0,
+                    "p95": 4.0,
+                    "p99": 6.0,
+                    "max": 7.0
                 },
                 "reconnectAttempts": {
-                    "count": 121,
+                    "count": 136,
                     "mean": 1.0,
                     "p50": 1.0,
                     "p95": 1.0,
@@ -88,20 +88,20 @@
                     "max": 1.0
                 },
                 "recoveryLatencyMs": {
-                    "count": 121,
-                    "mean": 659.94,
-                    "p50": 656.0,
-                    "p95": 880.0,
-                    "p99": 895.0,
-                    "max": 916.0
+                    "count": 136,
+                    "mean": 501.63,
+                    "p50": 511.0,
+                    "p95": 711.0,
+                    "p99": 745.0,
+                    "max": 747.0
                 },
                 "bytesOnWire": {
                     "count": 500,
-                    "mean": 35864.61,
-                    "p50": 35313.0,
-                    "p95": 68349.0,
-                    "p99": 71890.0,
-                    "max": 72795.0
+                    "mean": 28678.14,
+                    "p50": 28311.0,
+                    "p95": 55868.0,
+                    "p99": 58854.0,
+                    "max": 59438.0
                 }
             },
             {
@@ -109,17 +109,17 @@
                 "sessions": 500,
                 "succeeded": 500,
                 "successRate": 100.0,
-                "reconnectSessions": 117,
+                "reconnectSessions": 110,
                 "retransmits": {
                     "count": 500,
-                    "mean": 36.48,
-                    "p50": 36.0,
-                    "p95": 71.0,
-                    "p99": 82.0,
-                    "max": 93.0
+                    "mean": 2.98,
+                    "p50": 2.0,
+                    "p95": 9.0,
+                    "p99": 11.0,
+                    "max": 14.0
                 },
                 "reconnectAttempts": {
-                    "count": 117,
+                    "count": 110,
                     "mean": 1.0,
                     "p50": 1.0,
                     "p95": 1.0,
@@ -127,20 +127,20 @@
                     "max": 1.0
                 },
                 "recoveryLatencyMs": {
-                    "count": 117,
-                    "mean": 656.44,
-                    "p50": 649.0,
-                    "p95": 886.0,
-                    "p99": 908.0,
-                    "max": 923.0
+                    "count": 110,
+                    "mean": 496.08,
+                    "p50": 504.0,
+                    "p95": 709.0,
+                    "p99": 743.0,
+                    "max": 748.0
                 },
                 "bytesOnWire": {
                     "count": 500,
-                    "mean": 36675.56,
-                    "p50": 36436.0,
-                    "p95": 68779.0,
-                    "p99": 72155.0,
-                    "max": 73374.0
+                    "mean": 30332.92,
+                    "p50": 30926.0,
+                    "p95": 56348.0,
+                    "p99": 58982.0,
+                    "max": 59761.0
                 }
             },
             {
@@ -148,17 +148,17 @@
                 "sessions": 500,
                 "succeeded": 500,
                 "successRate": 100.0,
-                "reconnectSessions": 133,
+                "reconnectSessions": 129,
                 "retransmits": {
                     "count": 500,
-                    "mean": 110.88,
-                    "p50": 111.0,
-                    "p95": 218.0,
-                    "p99": 239.0,
-                    "max": 258.0
+                    "mean": 8.78,
+                    "p50": 8.0,
+                    "p95": 20.0,
+                    "p99": 26.0,
+                    "max": 30.0
                 },
                 "reconnectAttempts": {
-                    "count": 133,
+                    "count": 129,
                     "mean": 1.0,
                     "p50": 1.0,
                     "p95": 1.0,
@@ -166,20 +166,20 @@
                     "max": 1.0
                 },
                 "recoveryLatencyMs": {
-                    "count": 133,
-                    "mean": 668.7,
-                    "p50": 663.0,
-                    "p95": 910.0,
-                    "p99": 930.0,
-                    "max": 933.0
+                    "count": 129,
+                    "mean": 486.04,
+                    "p50": 482.0,
+                    "p95": 707.0,
+                    "p99": 745.0,
+                    "max": 745.0
                 },
                 "bytesOnWire": {
                     "count": 500,
-                    "mean": 37486.7,
-                    "p50": 38156.0,
-                    "p95": 72907.0,
-                    "p99": 75426.0,
-                    "max": 76674.0
+                    "mean": 30445.33,
+                    "p50": 29905.0,
+                    "p95": 58985.0,
+                    "p99": 61566.0,
+                    "max": 62413.0
                 }
             },
             {
@@ -187,17 +187,17 @@
                 "sessions": 500,
                 "succeeded": 500,
                 "successRate": 100.0,
-                "reconnectSessions": 129,
+                "reconnectSessions": 138,
                 "retransmits": {
                     "count": 500,
-                    "mean": 223.99,
-                    "p50": 232.0,
-                    "p95": 426.0,
-                    "p99": 449.0,
-                    "max": 469.0
+                    "mean": 17.35,
+                    "p50": 15.0,
+                    "p95": 38.0,
+                    "p99": 46.0,
+                    "max": 54.0
                 },
                 "reconnectAttempts": {
-                    "count": 129,
+                    "count": 138,
                     "mean": 1.0,
                     "p50": 1.0,
                     "p95": 1.0,
@@ -205,26 +205,26 @@
                     "max": 1.0
                 },
                 "recoveryLatencyMs": {
-                    "count": 129,
-                    "mean": 643.91,
-                    "p50": 639.0,
-                    "p95": 878.0,
-                    "p99": 916.0,
-                    "max": 934.0
+                    "count": 138,
+                    "mean": 508.05,
+                    "p50": 534.0,
+                    "p95": 737.0,
+                    "p99": 744.0,
+                    "max": 750.0
                 },
                 "bytesOnWire": {
                     "count": 500,
-                    "mean": 41228.69,
-                    "p50": 42654.0,
-                    "p95": 77187.0,
-                    "p99": 79805.0,
-                    "max": 80255.0
+                    "mean": 32551.02,
+                    "p50": 32678.0,
+                    "p95": 61423.0,
+                    "p99": 65640.0,
+                    "max": 66957.0
                 }
             }
         ],
-        "maxPayloadBytes": 57499,
+        "maxPayloadBytes": 57497,
         "maxPayloadTracks": 500,
-        "bytesOnWire500Tracks": 60006,
+        "bytesOnWire500Tracks": 69009,
         "chunks500Tracks": 3001,
         "frameHeaderBytes": 6,
         "chunkHeaderBytes": 4
@@ -232,19 +232,19 @@
     "degradation": {
         "sessions": 2000,
         "framesObserved": 1200000,
-        "liveFrames": 1010178,
-        "lastKnownFrames": 140798,
-        "unavailableFrames": 49024,
-        "livePct": 84.18,
-        "lastKnownPct": 11.73,
-        "unavailablePct": 4.09,
+        "liveFrames": 1011245,
+        "lastKnownFrames": 140685,
+        "unavailableFrames": 48070,
+        "livePct": 84.27,
+        "lastKnownPct": 11.72,
+        "unavailablePct": 4.01,
         "recoveryLatencyMs": {
-            "count": 3502,
-            "mean": 115.22,
+            "count": 3435,
+            "mean": 115.28,
             "p50": 100.0,
             "p95": 200.0,
             "p99": 300.0,
-            "max": 400.0
+            "max": 500.0
         }
     },
     "payload": {

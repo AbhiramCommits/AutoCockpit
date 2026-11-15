@@ -7,16 +7,16 @@
 > Task :core:run
 AutoCockpit simulation 0.7.0 (schema 1)
   seed 42, 500 sessions x 4 loss rates = 2000 sessions
-  wall time 6414.93 ms (3207.47 us/session)
-  handoff success 100.0% (2000/2000), retransmits mean 97.42 p95 358.0
-  reconnect attempts mean 1.0 p95 1.0; recovery mean 657.32ms p95 890.0ms
-    loss 0%: success 100.00%, retransmits mean 18.35 p95 38, recovery mean 659.94ms p95 880ms
-    loss 1%: success 100.00%, retransmits mean 36.48 p95 71, recovery mean 656.44ms p95 886ms
-    loss 5%: success 100.00%, retransmits mean 110.88 p95 218, recovery mean 668.70ms p95 910ms
-    loss 10%: success 100.00%, retransmits mean 223.99 p95 426, recovery mean 643.91ms p95 878ms
-  degradation frames 1200000: LIVE 84.18% LAST_KNOWN 11.73% UNAVAILABLE 4.09%
-  payload 500 tracks: 48002 bytes, 3001 chunks at MTU 20
+  wall time 5804.27 ms (2902.13 us/session)
+  handoff success 100.0% (2000/2000), retransmits mean 7.62 p95 29.0
+  reconnect attempts mean 1.0 p95 1.0; recovery mean 498.25ms p95 717.0ms
+    loss 0%: success 100.00%, retransmits mean 1.36 p95 4, recovery mean 501.63ms p95 711ms
+    loss 1%: success 100.00%, retransmits mean 2.98 p95 9, recovery mean 496.08ms p95 709ms
+    loss 5%: success 100.00%, retransmits mean 8.78 p95 20, recovery mean 486.04ms p95 707ms
+    loss 10%: success 100.00%, retransmits mean 17.35 p95 38, recovery mean 508.05ms p95 737ms
+  degradation frames 1200000: LIVE 84.27% LAST_KNOWN 11.72% UNAVAILABLE 4.01%
+  payload 500 tracks: 48002 bytes, 3001 chunks at the 20-byte ATT payload
   wrote results/simulation.json
 
-BUILD SUCCESSFUL in 7s
+BUILD SUCCESSFUL in 6s
 3 actionable tasks: 2 executed, 1 up-to-date
